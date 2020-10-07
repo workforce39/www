@@ -1,18 +1,18 @@
 <template>
-  <section class="main-section">
-    <div class="content">
-      <div class="king">
-        <span class="subtitle mypadmar"><i>Ethereum-based game</i></span>
-        <h1 class="crown mypadmar">👑</h1>
-        <h1 class="mypadmar">King Of The Hill:</h1>
-        <div class="neon-box">
-          <span class="address mypadmar">{{ king ? king : 'The position is vacant' }}</span>
+  <div class="container">
+    <div class="offer has-text-centered">
+      <div class="content">
+        <span class="subtitle"><i>Ethereum-based game</i></span>
+        <h1 class="crown">👑</h1>
+        <h1>King Of The Hill:</h1>
+        <div class="neon-border">
+          <p class="address">{{ king ? king : 'The position is vacant' }}</p>
           <span v-if="king">💰 Minimum reward: {{ fromWei(fee) }} ETH</span>
-          <span v-if="king">Reign time: {{
+          <span v-if="king">⏳ Reign time: {{
               `${getReignTime().hours} hours ${getReignTime().minutes} minutes ${getReignTime().seconds} seconds`
             }}</span>
         </div>
-        <div class="field has-addons">
+        <div class="field has-addons-centered has-addons">
           <p class="control">
             <input v-model="donation" @keypress="onlyNumber" class="input is-rounded" type="text">
           </p>
@@ -30,11 +30,10 @@
         </div>
         <p>Your possible reward will be at least <strong>{{ (Number(donation) + donation * 30 / 100).toFixed(5) }}
           ETH</strong> (minus my fee of 5%)</p>
-        <p><span style="color: #ff0000;">🚨 Make sure that the gas price does not exceed your minimum possible reward! 🚨</span>
-        </p>
+        <p style="color: #ff0000;">🚨 Make sure that the gas price does not exceed your minimum possible reward! 🚨</p>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -173,7 +172,7 @@ export default {
 
       return {hours: hrs, minutes: mins, seconds: secs};
     },
-    onlyNumber ($event) {
+    onlyNumber($event) {
       let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
       if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) { // 46 is dot
         $event.preventDefault();

@@ -1,11 +1,11 @@
 <template>
-  <header class="header">
-    <div class="container">
-      <div class="profile">
-        <span class="tag">Hello, {{ account.address || 'Guest' }}</span><span v-if="account.address">&nbsp;&nbsp;&nbsp;<a href="#" @click="logout">Logout</a></span><span v-else>&nbsp;&nbsp;&nbsp;<a href="#" @click="login">Login</a></span>
-      </div>
+  <div class="container">
+    <div class="account has-text-right">
+      <span class="tag">Hello, {{ account.address || 'Guest' }}</span><span v-if="account.address">&nbsp;&nbsp;&nbsp;<a
+        href="#" @click="logout">Logout</a></span><span v-else>&nbsp;&nbsp;&nbsp;<a href="#"
+                                                                                    @click="login">Login</a></span>
     </div>
-  </header>
+  </div>
 </template>
 
 <script>
@@ -25,8 +25,7 @@ export default {
     login() {
       eventHub.$emit('LOGIN');
     },
-    logout()
-    {
+    logout() {
       this.$store.commit("UPDATE_ACCOUNT", {});
     }
   }

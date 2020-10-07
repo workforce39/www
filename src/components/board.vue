@@ -1,62 +1,65 @@
 <template>
-  <section class="main-section">
-    <div class="container">
-      <div class="contentbox">
-        <b-tabs position="is-centered">
-          <b-tab-item label="Last 10 kings">
-            <table class="table is-fullwidth">
-              <thead>
-              <tr>
-                <th>👑 King</th>
-                <th>Since Of</th>
-                <th>Minimum reward</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="(i, index) in board" :key="index">
-                <td>{{ i.king }}</td>
-                <td>{{ new Date(i.sinceOf * 1000).toLocaleString() }}</td>
-                <td>{{ fromWei(i.fee) }}
-                  <div class="eth-icon-16"></div>
-                </td>
-              </tr>
-              </tbody>
-            </table>
-          </b-tab-item>
-          <b-tab-item label="How to play">
-            <p>
-              Dear friend, welcome to KingHill.io
-            </p>
-            <br>
-            <p>
-              This is a simple game based on the Ethereum blockchain.
-            </p>
-            <br>
-            <p>
-              The rules are as follows:<br>
-              A player can become the "King of the Hill" if they pay a certain price in ETH tokens. Tokens paid will automatically go to the previous "King of the Hill", minus my fee of 5%.
-            </p>
-            <br>
-            <p>
-              The same thing will happen to you! When the new "King of the Hill" appears, you will receive a reward.
-            </p>
-            <br>
-            <p>
-              How is the price formed?
-            </p>
-            <br>
-            <p>
-              The price of becoming the "King of the Hill" starts at 0.001 ETH and is increased by 30% with every new ruler. But be careful: if you don't find a successor in 24 hours, the price will be reset to the starting value.
-            </p>
-            <br>
-            <p>
-              Do you have any questions or just want to chat? Here's my telegram: <a href="https://t.me/stdi0">@stdi0</a>
-            </p>
-          </b-tab-item>
-        </b-tabs>
-      </div>
+  <div class="container">
+    <div class="content-box">
+      <b-tabs position="is-centered">
+        <b-tab-item label="Last 10 kings">
+          <table class="table is-fullwidth">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>👑 King</th>
+              <th>Since Of</th>
+              <th>Minimum reward</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(i, index) in board" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ i.king }}</td>
+              <td>{{ new Date(i.sinceOf * 1000).toLocaleString() }}</td>
+              <td>{{ fromWei(i.fee) }}
+                <div class="eth-icon-16"></div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </b-tab-item>
+        <b-tab-item label="How to play">
+          <p>
+            Dear friend, welcome to KingHill.io
+          </p>
+          <br>
+          <p>
+            This is a simple game based on the Ethereum blockchain.
+          </p>
+          <br>
+          <p>
+            The rules are as follows:<br>
+            A player can become the "King of the Hill" if they pay a certain price in ETH tokens. Tokens paid will
+            automatically go to the previous "King of the Hill", minus my fee of 5%.
+          </p>
+          <br>
+          <p>
+            The same thing will happen to you! When the new "King of the Hill" appears, you will receive a reward.
+          </p>
+          <br>
+          <p>
+            How is the price formed?
+          </p>
+          <br>
+          <p>
+            The price of becoming the "King of the Hill" starts at 0.001 ETH and is increased by 30% with every new
+            ruler. But be careful: if you don't find a successor in 24 hours, the price will be reset to the starting
+            value.
+          </p>
+          <br>
+          <p>
+            Do you have any questions or just want to chat? Here's my telegram: <a href="https://t.me/stdi0">@stdi0</a>
+          </p>
+        </b-tab-item>
+      </b-tabs>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
