@@ -6,24 +6,24 @@
         <h1 class="crown mypadmar">👑</h1>
         <h1 class="mypadmar">King Of The Hill:</h1>
         <div class="neon-box">
-          <span class="address mypadmar">{{ getReignTime().hours >= 24 ? 'The position is vacant' : king }}</span>
-          <span>💰 Minimum reward: {{ fromWei(fee) }} ETH</span>
-          <span v-if="getReignTime().hours < 24">Reign time: {{
+          <span class="address mypadmar">{{ king ? king : 'The position is vacant' }}</span>
+          <span v-if="king">💰 Minimum reward: {{ fromWei(fee) }} ETH</span>
+          <span v-if="king">Reign time: {{
               `${getReignTime().hours} hours ${getReignTime().minutes} minutes ${getReignTime().seconds} seconds`
             }}</span>
         </div>
         <div class="field has-addons">
           <p class="control">
-            <input v-model="donation" @keypress="onlyNumber" class="input is-rounded" type="text" placeholder="Rounded input">
+            <input v-model="donation" @keypress="onlyNumber" class="input is-rounded" type="text">
           </p>
           <p class="control">
-            <span class="button is-rounded" @click="donation=fromWei(fee)">
+            <span class="button is-rounded" @click="donation = fromWei(fee)">
               MIN
             </span>
           </p>
           <p class="control">
             <span class="button btn is-link is-rounded" @click="newKing()">
-              Become king for {{ getReignTime().hours >= 24 ? '0.001' : donation }}
+              Become king for {{ donation }}
               <div class="eth-icon-24"></div>
             </span>
           </p>
@@ -44,9 +44,9 @@ import eventHub from "../event.js"
 const Web3 = require('web3');
 
 const ethEnabled = () => {
-  if (window.ethereum) {
-    window.web3 = new Web3(window.ethereum);
-    window.ethereum.enable();
+  if (ethereum) {
+    web3 = new Web3(ethereum);
+    ethereum.enable();
     return true;
   }
   return false;
@@ -58,10 +58,10 @@ export default {
     return {
       king: '',
       fee: 0,
+      donation: 0.001,
       sinceOf: 0,
       contract: null,
       board: [],
-      donation: 0
     }
   },
   mounted() {
@@ -74,41 +74,49 @@ export default {
   computed: {
     account() {
       return this.$store.state.account;
+    },
+    timeIsOver() {
+      return this.getReignTime().hours >= 24;
     }
   },
   methods: {
     init() {
       if (!ethEnabled()) {
         alert("Please install an Ethereum-compatible browser or extension like MetaMask to use this dApp!");
+      } else {
+        let account0;
+        web3.eth.getAccounts().then((result) => {
+          account0 = result[0];
+          if (!this.account.address || account0 !== this.account.address) {
+            this.$store.commit("UPDATE_ACCOUNT", {
+              address: account0
+            });
+            this.$buefy.snackbar.open({
+              duration: 3000,
+              message: 'You have been successfully authorized!',
+              type: 'is-success',
+              queue: false,
+              // position: 'is-top',
+            })
+          }
+        })
+
+        this.fee = this.toWei(0.001);
+        this.contract = new web3.eth.Contract(json.abi, this.$contractAddress);
       }
-
-      let account0;
-      window.web3.eth.getAccounts().then((result) => {
-        account0 = result[0];
-        if (!this.account.address || account0 !== this.account.address) {
-          this.$store.commit("UPDATE_ACCOUNT", {
-            address: account0
-          });
-          this.$buefy.snackbar.open({
-            duration: 3000,
-            message: 'You have been successfully authorized!',
-            type: 'is-success',
-            queue: false,
-            // position: 'is-top',
-          })
-        }
-      })
-
-      console.log('[CONTRACT ADDRESS]', this.$contractAddress);
-
-      this.contract = new window.web3.eth.Contract(json.abi, this.$contractAddress);
     },
     setKing(king) {
-      if (king && (this.king !== king[0] || this.fee !== king[1] || this.sinceOf !== king[2])) {
-        this.king = king[0];
-        this.fee = king[1];
+      if (king && (this.sinceOf !== king[2])) {
         this.sinceOf = king[2];
-        this.donation = this.fromWei(this.fee);
+        if (this.timeIsOver) {
+          this.king = "";
+          this.fee = this.toWei(0.001);
+          this.donation = 0.001;
+        } else {
+          this.king = king[0];
+          this.fee = king[1];
+          this.donation = this.fromWei(this.fee);
+        }
       }
     },
     async newKing() {
@@ -117,7 +125,7 @@ export default {
       if (this.account.address) {
         this.contract.methods.newKing().send({
           from: this.account.address,
-          value: window.web3.utils.toWei(String(this.donation), 'ether')
+          value: this.toWei(this.donation)
         })
             .then((receipt) => {
               this.$buefy.snackbar.open({
@@ -140,13 +148,17 @@ export default {
     },
     async getKing() {
       this.contract.methods.getKing().call((err, result) => {
-        console.log('[GET KING]', result);
         this.setKing(result);
       });
     },
     fromWei(wei) {
-      if (web3.utils) {
-        return window.web3.utils.fromWei(String(wei), 'ether');
+      if (web3 && web3.utils) {
+        return web3.utils.fromWei(String(wei), 'ether');
+      }
+    },
+    toWei(ether) {
+      if (web3 && web3.utils) {
+        return web3.utils.toWei(String(ether), 'ether')
       }
     },
     getReignTime() {
@@ -162,7 +174,6 @@ export default {
       return {hours: hrs, minutes: mins, seconds: secs};
     },
     onlyNumber ($event) {
-      //console.log($event.keyCode); //keyCodes value
       let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
       if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) { // 46 is dot
         $event.preventDefault();

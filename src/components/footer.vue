@@ -3,7 +3,7 @@
     <div class="container">
       <div class="columns">
         <div class="column">
-          <p>We ❤️ opensource: <a href="https://github.com/stdi0/kinghill">github.com/stdi0/kinghill</a></p>
+          <p>We ❤️ opensource: <a href="https://github.com/kinghillio">github.com/kinghillio</a></p>
         </div>
         <div class="column">
           <div class="has-text-right has-text-right-tablet">

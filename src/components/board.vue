@@ -9,7 +9,7 @@
               <tr>
                 <th>👑 King</th>
                 <th>Since Of</th>
-                <th>Reward</th>
+                <th>Minimum reward</th>
               </tr>
               </thead>
               <tbody>
@@ -73,9 +73,11 @@ export default {
     }
   },
   mounted() {
-    this.contract = new window.web3.eth.Contract(json.abi, this.$contractAddress)
-    this.getEvents();
-    setInterval(this.getEvents, 1000);
+    if (web3) {
+      this.contract = new web3.eth.Contract(json.abi, this.$contractAddress)
+      this.getEvents();
+      setInterval(this.getEvents, 1000);
+    }
   },
   computed: {
     account() {
@@ -100,8 +102,8 @@ export default {
       )
     },
     fromWei(wei) {
-      if (web3.utils) {
-        return window.web3.utils.fromWei(String(wei), 'ether');
+      if (web3 && web3.utils) {
+        return web3.utils.fromWei(String(wei), 'ether');
       }
     },
     getReignTime() {
