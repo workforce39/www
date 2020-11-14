@@ -53,6 +53,12 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    extensions: ['.js', '.vue', '.json'],
+    alias: {
+      '@': path.resolve('src'),
+    }
+  },
   plugins: [
     new MiniCssExtractPlugin({
       filename: 'css/styles.css'
