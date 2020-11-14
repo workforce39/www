@@ -2,6 +2,15 @@ const axios = require('axios');
 import { elasticUrl, elasticUser, elasticPass } from '../network';
 //const elasticUrl = 'http://31.31.203.177:9200'
 
+export async function search(index, params, size, from = 0) {
+  try {
+    let result = (await getItems(index, params, size, from)).data.hits;
+    return result;
+  } catch (e) {
+    console.log("error:", e)
+  }
+}
+
 export function getItems(index, filters, size = 10, from = 0) {
   const config = {
     from,

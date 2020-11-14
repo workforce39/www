@@ -2,6 +2,55 @@
   <div class="container">
     <div class="board">
       <b-tabs position="is-centered">
+        <b-tab-item label="Баланс">
+          <table class="table is-bordered is-fullwidth">
+            <thead>
+              <th>№ строки</th>
+              <th>Наименование показателя</th>
+              <th>Тыс. человек</th>
+            </thead>
+            <tbody>
+            <tr>
+              <td><b>I.</b></td>
+              <td><b>Формирование трудовых ресурсов</b></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td rowspan="2">1.</td>
+              <td>Численность трудовых ресурсов - всего</td>
+              <td rowspan="2"></td>
+            </tr>
+            <tr>
+              <td>в том числе:</td>
+            </tr>
+            <tr>
+              <td>1.1.</td>
+              <td>Трудоспособное население в трудоспособном возрасте</td>
+              <td>{{ balanceTable.count1 }}</td>
+            </tr>
+            <tr>
+              <td>1.2.</td>
+              <td>Иностранные трудовые мигранты</td>
+              <td>{{ balanceTable.count2 }}</td>
+            </tr>
+            <tr>
+              <td>1.3.</td>
+              <td>Пенсионеры старше трудоспособного возраста</td>
+              <td>{{ balanceTable.count3 }}</td>
+            </tr>
+            <tr>
+              <td>1.4.</td>
+              <td>Подростки моложе трудоспособного возраста</td>
+              <td>{{ balanceTable.count4 }}</td>
+            </tr>
+            <tr>
+              <td><b>II.</b></td>
+              <td><b>Распределение трудовых ресурсов по разделам ОКВЭД:</b></td>
+              <td></td>
+            </tr>
+            </tbody>
+          </table>
+        </b-tab-item>
         <b-tab-item label="Кадры">
           <b-table
               :data="data"
@@ -12,6 +61,7 @@
               :total="total"
               :per-page="size"
               @page-change="onPageChange"
+              :current-page.sync="currentPage"
               aria-next-label="Следующая страница"
               aria-previous-label="Предыдущая страница"
               aria-page-label="Страница"
@@ -84,7 +134,11 @@
 
 <script>
 import eventHub from "../event.js"
-import {getItems} from "../libs/elasticsearch";
+import {getItems, search} from "../libs/elasticsearch";
+import {Trudosposobnoe_naselenie_v_trudosposobnom_vozraste} from "../queries/trudoposobnoe_naselenie_v_trudosposobnom_vozraste";
+import {Inostrannie_trudovie_migranty} from "../queries/inostrannie_trudovie_migranty";
+import {Starshe_trudosposobnogo_vozrasta} from "../queries/starshe_trudosposobnogo_vozrasta";
+import {Moloje_trudosposobnogo_vozrasta} from "../queries/moloje_trudosposobnogo_vozrasta";
 
 export default {
   components: {},
@@ -94,12 +148,21 @@ export default {
       data: [],
       total: 10,
       loading: false,
-      from: 0,
-      size: 10
+      currentPage: 1,
+      size: 10,
+
+      balanceTable: {
+        count1: 0,
+        count2: 0,
+        count3: 0,
+        count4: 0,
+      }
     }
   },
   mounted() {
     this.onPageChange(0);
+
+    this.balance();
   },
   computed: {
     account() {
@@ -107,29 +170,31 @@ export default {
     }
   },
   methods: {
-    async getItems(index, _params, size, from = 0) {
-      let params = { ..._params };
-      params.sort = [{"_score": {"order": "desc"}}];
-
-      try {
-        let result = (await getItems(index, params, size, from)).data.hits;
-
+    onPageChange(page) {
+      const from = page === 0 ? page : page - 1;
+      search("people", {}, this.size, from).then(result => {
         this.total = result.total && result.total.value || 0;
 
         const items = result.hits.map(el => {
-          return el._source //.doc
+          return el._source
         });
 
-        this.from += this.size;
-
         this.data = items;
-      } catch (e) {
-        console.log('error:', e)
-      }
+      })
     },
-    onPageChange(page) {
-      this.getItems('people', {}, this.size, this.size * page)
-    },
+    async balance() {
+      const total = await Trudosposobnoe_naselenie_v_trudosposobnom_vozraste();
+      this.balanceTable.count1 = total;
+
+      const total2 = await Inostrannie_trudovie_migranty();
+      this.balanceTable.count2 = total2;
+
+      const total3 = await Starshe_trudosposobnogo_vozrasta();
+      this.balanceTable.count3 = total3;
+
+      const total4 = await Moloje_trudosposobnogo_vozrasta();
+      this.balanceTable.count4 = total4;
+    }
   }
 }
 </script>
