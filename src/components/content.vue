@@ -8,6 +8,9 @@
         <b-tab-item label="Кадры">
           <peoples />
         </b-tab-item>
+        <b-tab-item label="Организации">
+          <orgs />
+        </b-tab-item>
         <b-tab-item label="Описание кейса">
           <about />
         </b-tab-item>
@@ -19,10 +22,11 @@
 <script>
 import Balance from "@/components/tabs/balance/balance.vue";
 import Peoples from "@/components/tabs/peoples/peoples.vue";
+import Orgs from "@/components/tabs/orgs/orgs.vue";
 import About from "@/components/tabs/about/about.vue";
 
 export default {
-  components: {About, Balance, Peoples },
+  components: {About, Balance, Peoples, Orgs},
   data() {
     return {
     }
