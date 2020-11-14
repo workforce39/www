@@ -74,9 +74,9 @@ export default {
     onPageChange(page) {
       const from = page === 0 ? page : page - 1;
       search("people", {}, this.size, from).then(result => {
-        this.total = result.total && result.total.value || 0;
+        this.total = result.hits.total && result.hits.total.value || 0;
 
-        const items = result.hits.map(el => {
+        const items = result.hits.hits.map(el => {
           return el._source
         });
 

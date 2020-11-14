@@ -4,7 +4,7 @@ import { elasticUrl, elasticUser, elasticPass } from '../network';
 
 export async function search(index, params, size, from = 0) {
   try {
-    let result = (await getItems(index, params, size, from)).data.hits;
+    let result = (await getItems(index, params, size, from)).data;
     return result;
   } catch (e) {
     console.log("error:", e)
@@ -39,7 +39,7 @@ export function getItems(index, filters, size = 10, from = 0) {
 
 function convertParamsElastic(params, prefixField = '') {
   let must = Object.entries(params.params)
-    .filter(([key, value]) => key != 'sort' && key != 'pagination' && value !== '' && value != null)
+    .filter(([key, value]) => key != 'sort' && key != 'pagination' && key != 'aggs' && value !== '' && value != null)
     .map(([key, value]) => getMatch(key, value, prefixField));
 
   let query = {
@@ -53,6 +53,10 @@ function convertParamsElastic(params, prefixField = '') {
       }
     }
   };
+
+  if (params.params.aggs) {
+    query.aggs = params.params.aggs
+  }
 
   if (params.params.pagination && params.params.pagination.search_after_timestamp && params.params.pagination.search_after_id) {
     query.search_after = [params.params.pagination.search_after_score, params.params.pagination.search_after_timestamp, params.params.pagination.search_after_id];
