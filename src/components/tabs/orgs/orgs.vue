@@ -56,7 +56,7 @@ export default {
   },
   methods: {
     onPageChange(page) {
-      const from = page === 0 ? page : page - 1;
+      const from = page === 0 ? 0 : this.size * (page - 1);
       search("org", {}, this.size, from).then(result => {
         this.total = result.hits.total && result.hits.total.value || 0;
 
