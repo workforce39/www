@@ -3,11 +3,11 @@
     <div class="container">
       <div class="columns">
         <div class="column">
-          <p>We ❤️ opensource: <a href="https://github.com/kinghillio">github.com/kinghillio</a></p>
+          <p>Мы ❤️ открытый исходный код: <a href="https://github.com/workforce39">github.com/workforce39</a></p>
         </div>
         <div class="column">
           <div class="has-text-right has-text-right-tablet">
-            <p class="title is-6">KingHill.io &copy; 2020</p>
+            <p class="title is-6">Хакатон "Цифровой прорыв" &copy; 2020</p>
           </div>
         </div>
       </div>
@@ -16,12 +16,11 @@
 </template>
 
 <script>
-import {domain, rootUrl} from "../network.js"
+import { domain } from "../network.js";
 
 export default {
   data() {
     return {
-      rootUrl: rootUrl,
       domain: domain
     };
   }

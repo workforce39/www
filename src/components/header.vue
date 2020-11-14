@@ -1,9 +1,21 @@
 <template>
   <div class="container">
-    <div class="account has-text-right">
-      <span class="tag">Hello, {{ account.address || 'Guest' }}</span><span v-if="account.address">&nbsp;&nbsp;&nbsp;<a
-        href="#" @click="logout">Logout</a></span><span v-else>&nbsp;&nbsp;&nbsp;<a href="#"
-                                                                                    @click="login">Login</a></span>
+    <div class="flex">
+      <div class="flex-start">
+        <span class="crown">💼️</span>&nbsp;&nbsp;<span class="title">Трудовые ресурсы</span>
+      </div>
+      <div class="flex-end">
+        <div class="user">
+<!--          <div class="flex">-->
+<!--            Ethereum network:&nbsp;<strong>{{ network }}</strong>-->
+<!--          </div>-->
+          <div class="hello flex-end">
+            👋 Привет, Гость&nbsp;&nbsp;&nbsp;
+            <a v-if="account.address" href="#" @click="logout">Выход</a>
+            <a v-else href="#" @click="login">Вход</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -19,6 +31,9 @@ export default {
   computed: {
     account() {
       return this.$store.state.account;
+    },
+    network() {
+      return this.$store.state.network;
     }
   },
   methods: {

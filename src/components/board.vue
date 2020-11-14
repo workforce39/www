@@ -1,61 +1,81 @@
 <template>
   <div class="container">
-    <div class="content-box">
+    <div class="board">
       <b-tabs position="is-centered">
-        <b-tab-item label="Last 10 kings">
-          <table class="table is-fullwidth">
-            <thead>
-            <tr>
-              <th>#</th>
-              <th>👑 King</th>
-              <th>Since Of</th>
-              <th>Minimum reward</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(i, index) in board" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>{{ i.king }}</td>
-              <td>{{ new Date(i.sinceOf * 1000).toLocaleString() }}</td>
-              <td>{{ fromWei(i.fee) }}
-                <div class="eth-icon-16"></div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
+        <b-tab-item label="Кадры">
+          <b-table
+              :data="data"
+              :loading="loading"
+
+              paginated
+              backend-pagination
+              :total="total"
+              :per-page="size"
+              @page-change="onPageChange"
+              aria-next-label="Следующая страница"
+              aria-previous-label="Предыдущая страница"
+              aria-page-label="Страница"
+              aria-current-label="Текущая страница">
+
+            <b-table-column field="fio" label="ФИО" v-slot="props">
+              {{ props.row.fio }}
+            </b-table-column>
+
+            <b-table-column field="age" label="Возраст" centered v-slot="props">
+              {{ props.row.age }}
+            </b-table-column>
+
+            <b-table-column field="floor" label="Пол" v-slot="props">
+              {{ props.row.floor }}
+            </b-table-column>
+
+            <b-table-column field="citizenship" label="Гражданство" centered v-slot="props">
+              {{ props.row.citizenship }}
+            </b-table-column>
+
+            <b-table-column field="education" label="Образование" width="500" v-slot="props">
+              {{ props.row.education }}
+            </b-table-column>
+
+            <b-table-column field="profession" label="Профессия" v-slot="props">
+              {{ props.row.profession }}
+            </b-table-column>
+
+            <b-table-column field="org" label="Организация" v-slot="props">
+              {{ props.row.org }}
+            </b-table-column>
+
+          </b-table>
         </b-tab-item>
-        <b-tab-item label="How to play">
-          <p>
-            Dear friend, welcome to KingHill.io
-          </p>
+        <b-tab-item label="Описание кейса">
+          <p><b>ОПИСАНИЕ КЕЙСА</b></p>
           <br>
-          <p>
-            This is a simple game based on the Ethereum blockchain.
-          </p>
+          <p>Баланс трудовых ресурсов - система показателей, отражающих численность и состав трудовых ресурсов
+          и их распределение на занятых по видам экономической деятельности и формам собственности,
+            безработных и экономически неактивное население.</p>
           <br>
-          <p>
-            The rules are as follows:<br>
-            A player can become the "King of the Hill" if they pay a certain price in ETH tokens. Tokens paid will
-            automatically go to the previous "King of the Hill", minus my fee of 5%.
-          </p>
+          <p>По факту численность безработных граждан, состоящих на учете в областной службе занятости
+          населения, с начала года (3955 чел.) увеличилась на 24363 чел. или в 7,2 раза и составила 28318
+          человек. За неделю (с 02 по 09 июля) увеличение – на 1272 человека (4,7%). Уровень регистрируемой
+          безработицы составил 5,4% от рабочей силы 528,4 тыс. чел. (на аналогичную дату 2019 года – 4338
+            безработных граждан, уровень безработицы – 0,8%).</p>
           <br>
-          <p>
-            The same thing will happen to you! When the new "King of the Hill" appears, you will receive a reward.
-          </p>
+          <p>Проблемой является получение достоверной информации о качественных и количественных
+            характеристиках предложения рабочей силы на региональном рынке труда.</p>
           <br>
-          <p>
-            How is the price formed?
-          </p>
+          <p>Зачастую работодатели не стремятся подробно представить имеющуюся у них вакансию, расписать
+          требования к кандидатам с учетом реальной потребности, а относятся к размещению имеющихся у них
+            вакансий лишь с формальной точки зрения.</p>
           <br>
-          <p>
-            The price of becoming the "King of the Hill" starts at 0.001 ETH and is increased by 30% with every new
-            ruler. But be careful: if you don't find a successor in 24 hours, the price will be reset to the starting
-            value.
-          </p>
+          <p>В свою очередь потенциальные работники (зарегистрированные как безработные или ищущие работу) не
+            стремятся или, в ряде случаев, не умеют «продать себя».</p>
           <br>
-          <p>
-            Do you have any questions or just want to chat? Here's my telegram: <a href="https://t.me/stdi0">@stdi0</a>
-          </p>
+          <p>В разрабатываемую систему “Баланс трудовых ресурсов” входят два раздела. В первом показываются
+            ресурсы, во втором — их распределение</p>
+          <br>
+          <p>Система будет использоваться специалистами в сфере труда, занятости и образования с целью
+          оперативного реагирования на изменяющуюся ситуацию в экономике и, как следствие, изменение рынка
+            труда.</p>
         </b-tab-item>
       </b-tabs>
     </div>
@@ -63,24 +83,23 @@
 </template>
 
 <script>
-import json from '../KingOfTheHill.json';
 import eventHub from "../event.js"
+import {getItems} from "../libs/elasticsearch";
 
 export default {
   components: {},
   data() {
     return {
       contract: null,
-      board: [],
-      tab: 0
+      data: [],
+      total: 10,
+      loading: false,
+      from: 0,
+      size: 10
     }
   },
   mounted() {
-    if (web3) {
-      this.contract = new web3.eth.Contract(json.abi, this.$contractAddress)
-      this.getEvents();
-      setInterval(this.getEvents, 1000);
-    }
+    this.onPageChange(0);
   },
   computed: {
     account() {
@@ -88,33 +107,29 @@ export default {
     }
   },
   methods: {
-    getEvents() {
-      this.contract.getPastEvents(
-          'NewKing',
-          {
-            fromBlock: 0,
-            toBlock: 'latest'
-          },
-          (err, events) => {
-            this.board = events.map(e => {
-              return e.returnValues;
-            }).reverse().splice(0, 10)
+    async getItems(index, _params, size, from = 0) {
+      let params = { ..._params };
+      params.sort = [{"_score": {"order": "desc"}}];
 
-            eventHub.$emit('NEW_KING', this.board[0]);
-          }
-      )
-    },
-    fromWei(wei) {
-      if (web3 && web3.utils) {
-        return web3.utils.fromWei(String(wei), 'ether');
+      try {
+        let result = (await getItems(index, params, size, from)).data.hits;
+
+        this.total = result.total && result.total.value || 0;
+
+        const items = result.hits.map(el => {
+          return el._source //.doc
+        });
+
+        this.from += this.size;
+
+        this.data = items;
+      } catch (e) {
+        console.log('error:', e)
       }
     },
-    getReignTime() {
-      const sinceOf = new Date(this.sinceOf * 1000);
-      const now = new Date();
-      const timeDiff = now - sinceOf;
-      return new Date(timeDiff).toLocaleTimeString();
-    }
+    onPageChange(page) {
+      this.getItems('people', {}, this.size, this.size * page)
+    },
   }
 }
 </script>
