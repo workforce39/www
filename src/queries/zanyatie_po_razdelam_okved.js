@@ -21,7 +21,6 @@ export async function Zanyatie_po_razdelam_okved(n, year) {
   }
 
   let result = await search("org", params, 9999);
-  console.log("RESULT:", result);
 
   count += result.aggregations && result.aggregations.workers.workers_count.value || 0;
 

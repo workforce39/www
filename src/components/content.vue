@@ -5,6 +5,9 @@
         <b-tab-item label="Баланс">
           <balance />
         </b-tab-item>
+        <b-tab-item label="Прогноз">
+          <planning />
+        </b-tab-item>
         <b-tab-item label="Кадры">
           <peoples />
         </b-tab-item>
@@ -21,12 +24,13 @@
 
 <script>
 import Balance from "@/components/tabs/balance/balance.vue";
+import Planning from "@/components/tabs/planning/planning.vue";
 import Peoples from "@/components/tabs/peoples/peoples.vue";
 import Orgs from "@/components/tabs/orgs/orgs.vue";
 import About from "@/components/tabs/about/about.vue";
 
 export default {
-  components: {About, Balance, Peoples, Orgs},
+  components: {About, Balance, Planning, Peoples, Orgs},
   data() {
     return {
     }
