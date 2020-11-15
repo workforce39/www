@@ -1,10 +1,11 @@
 import {getItems, search} from "../libs/elasticsearch";
 
-const param = {
-  "citizenship.term": "иное",
-}
+export async function Inostrannie_trudovie_migranty(year) {
+  const param = {
+    "citizenship.term": "иное",
+    "update.match": year
+  }
 
-export async function Inostrannie_trudovie_migranty() {
   let count = 0;
 
   let result = await search("people", param, 9999);

@@ -73,7 +73,6 @@ export default {
   methods: {
     onPageChange(page) {
       const from = page === 0 ? 0 : this.size * (page - 1);
-      console.log("FROM PAGE", page, from);
       search("people", {}, this.size, from).then(result => {
         this.total = result.hits.total && result.hits.total.value || 0;
 

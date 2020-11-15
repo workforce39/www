@@ -1,5 +1,20 @@
 <template>
   <div class="container">
+    <div class="field">
+    <label class="label">Год баланса</label>
+    <div class="control">
+      <div class="select">
+        <select v-model="year" @change="balance(year)">
+          <option value="2020">2020</option>
+          <option value="2019">2019</option>
+          <option value="2018">2018</option>
+          <option value="2017">2017</option>
+          <option value="2016">2016</option>
+          <option value="2015">2015</option>
+        </select>
+      </div>
+    </div>
+  </div>
     <table v-if="isLoaded" class="table is-bordered is-fullwidth">
       <thead>
       <th>№ строки</th>
@@ -168,6 +183,7 @@ export default {
   components: {},
   data() {
     return {
+      year: 2020,
       isLoaded: false,
       balanceTable: {
         totalCount: 0,
@@ -180,7 +196,7 @@ export default {
     }
   },
   mounted() {
-    this.balance();
+    this.balance(this.year);
   },
   computed: {
     account() {
@@ -188,26 +204,27 @@ export default {
     }
   },
   methods: {
-    async balance() {
+    async balance(year) {
       this.isLoaded = false;
+      this.balanceTable.okved = [];
 
-      const totalCount = await search("people", {}, 9999);
+      const totalCount = await search("people", {"update.match": year}, 9999);
       this.balanceTable.totalCount = totalCount.hits && totalCount.hits.total.value || 0;
 
-      const total = await Trudosposobnoe_naselenie_v_trudosposobnom_vozraste();
+      const total = await Trudosposobnoe_naselenie_v_trudosposobnom_vozraste(year);
       this.balanceTable.count1 = total;
 
-      const total2 = await Inostrannie_trudovie_migranty();
+      const total2 = await Inostrannie_trudovie_migranty(year);
       this.balanceTable.count2 = total2;
 
-      const total3 = await Starshe_trudosposobnogo_vozrasta();
+      const total3 = await Starshe_trudosposobnogo_vozrasta(year);
       this.balanceTable.count3 = total3;
 
-      const total4 = await Moloje_trudosposobnogo_vozrasta();
+      const total4 = await Moloje_trudosposobnogo_vozrasta(year);
       this.balanceTable.count4 = total4;
 
       for (let i = 1; i <= 21; i++) {
-        setTimeout(Zanyatie_po_razdelam_okved(i).then(count => this.balanceTable.okved.push(count)), 1000);
+        setTimeout(Zanyatie_po_razdelam_okved(i, year).then(count => this.balanceTable.okved.push(count)), 1000);
       }
 
       this.isLoaded = true;

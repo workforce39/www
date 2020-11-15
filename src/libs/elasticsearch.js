@@ -1,5 +1,6 @@
 const axios = require('axios');
-import { elasticUrl, elasticUser, elasticPass } from '../network';
+import {elasticPass, elasticUrl, elasticUser} from '../network';
+
 //const elasticUrl = 'http://31.31.203.177:9200'
 
 export async function search(index, params, size, from = 0) {
@@ -38,24 +39,55 @@ export function getItems(index, filters, size = 10, from = 0) {
 }
 
 function convertParamsElastic(params, prefixField = '') {
-  let must = Object.entries(params.params)
-    .filter(([key, value]) => key != 'sort' && key != 'pagination' && key != 'aggs' && value !== '' && value != null)
-    .map(([key, value]) => getMatch(key, value, prefixField));
-
   let query = {
     //min_score: 1,
     from: params.from || 0,
     size: params.size || 10,
     sort: params.params.sort || [{"_score": {"order": "desc"}}],
     query: {
-      bool: {
-        must
-      }
+      bool: {}
     }
   };
 
-  if (params.params.aggs) {
-    query.aggs = params.params.aggs
+  let aggs;
+  let must = Object.entries(params.params)
+    .filter(([key, value]) => {
+      if (key.includes('.sum')) {
+        aggs = {
+          [`${prefixField}${key.split('.sum')[0]}`]: {
+            "filter": {
+              "bool": {
+                "must": Object.entries(value).filter(([k, v]) => k != "field").map(([k, v]) => {
+                  return getMatch(k, v, '')
+                })
+              }
+            },
+            "aggs": {
+              "workers_count": {
+                "sum": {
+                  "field": value["field"]
+                }
+              }
+            }
+          }
+        }
+
+        return false;
+      }
+
+      if (key != 'sort' && key != 'pagination' && value !== '' && value != null)
+        return true
+    })
+    .map(([key, value]) => {
+      return getMatch(key, value, prefixField);
+    });
+
+  if (must.length > 0) {
+    query.query.bool.must = must;
+  }
+
+  if (aggs) {
+    query.aggs = aggs
   }
 
   if (params.params.pagination && params.params.pagination.search_after_timestamp && params.params.pagination.search_after_id) {
@@ -103,7 +135,7 @@ function getMatch(key, value, prefixField) {
   }
 
   if (key.includes('.exists')) {
-    return {"exists": { "field": `${prefixField}${key.split('.exists')[0]}`}}
+    return {"exists": {"field": `${prefixField}${key.split('.exists')[0]}`}}
   }
 
   if (key.includes('.array')) {

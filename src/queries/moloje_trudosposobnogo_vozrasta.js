@@ -1,12 +1,13 @@
 import {getItems, search} from "../libs/elasticsearch";
 
-const param = {
-  "age.range": {
-    "lte": 15,
+export async function Moloje_trudosposobnogo_vozrasta(year) {
+  const param = {
+    "age.range": {
+      "lte": 15,
+    },
+    "update.match": year
   }
-}
 
-export async function Moloje_trudosposobnogo_vozrasta() {
   let count = 0;
 
   let result = await search("people", param, 9999);
